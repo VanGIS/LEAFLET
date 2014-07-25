@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+	<head>
+		 <link rel="stylesheet" href="leaflet.css" />
+		 <link rel="stylesheet" href="Leaflet_START.css" />
+		 <link rel="stylesheet" href="leaflet-search.css" />
+		 <link rel="stylesheet" href="http://www.bootswatch.com/cyborg/bootstrap.css"/>
+		 <script src="leaflet.js"></script>
+		 <script type="text/javascript" src="cities.js"></script>
+		 <script type="text/javascript" src="contacts.js"></script>
+		 <script type="text/javascript" src="leaflet-search.js"></script>
+		 <script type="text/javascript" src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+	</head>
+
+<body>
+	<nav class="navbar navbar-default" role="navigation">
+		<div class="container-fluid">
+    	<div class="navbar-inner">
+
+      		<a class="navbar-brand" href="#">BUSINESS CARDS</a>
+      		<ul id="main-menu" class="nav navbar-nav">
+
+         		<li class="active"><a href="spreadsheet.html">View Spreadsheet</a></li>
+         	</ul>
+         	<ul id="menu-right" class="nav navbar-nav navbar-right" style="margin-right:20px">
+      			<li><input id="searchText" type="text" class="form-control" style="width:200px"></input></li>
+        		<li><button id="searchButton" class="btn btn-default" type="button">Search By City</button></li>
+        	</ul>
+				
+
+   		</div>
+   	</div>
+	</nav>
+	
+	<div id="map"></div>
+			
+	<script type="text/javascript"> 
+
+
+		// Adding the map layer in
+		console.log("THIS IS A A TEST");
+		var map = new L.map('map').setView([32.836, -114.166], 8)
+			.addLayer(new L.tileLayer('https://{s}.tiles.mapbox.com/v3/bretx.j1facala/{z}/{x}/{y}.png'));
+
+
+		console.log('Map is ' + map);
+		map.attributionControl.setPrefix('Leaflet    |    UA-GIST'); // 'Leaflet' in bottom right		
+		
+        //Successful marker placement at Old Main
+		//var marker = L.marker([32.2318729, -110.9534516]).addTo(map);
+		//Adding a popup to the marker
+		//marker.bindPopup("<b>NAME:</b>Old Main<br><b>TITLE:</b>Oldest Building<br><b>ORGANIZATION:</b>University of Arizona<br><b>ADDRESS:</b>1200 E University Bl, Tucson,AZ 85721<br><b>CELL:</b><br><b>OFFICE:</b><br><b>EMAIL:</b><br><b>WEBSITE:</b><a href='http://en.wikipedia.org/wiki/Old_Main,_University_of_Arizona'>click here</a><br>").closePopup('marker');
+        
+        //To make a polygon
+		//Polygon Test:// var polygon = new L.polygon([
+		//	[32.228535, -110.955679],
+		//	[32.227905, -110.955686],
+		//	[32.227899, -110.955049],
+		//	[32.228537, -110.955039]
+
+		//]).addTo(map);
+
+		
+
+		var geojson;
+
+		var mapLayerGroups = [];
+
+		var searchControl = new L.Control.Search({layer: contacts_lyr, propertyName: 'NAME',circleLocation:true});
+		searchControl.on('search_locationfound', function(e) {
+			console.log(e.layer);
+			console.log(e.layer.get());
+			e.layer.setStyle({fillColor: '#3f0', color: '#0f0'});
+
+		}).on('search_collapsed',function(e) {
+				//restore feature color
+			contacts_lyr.eachLayer(function(layer) {
+				contacts_lyr.resetStyle(layer);
+			});
+		});
+			// Initialize search control
+		map.addControl(searchControl ); 
+
+
+		var contacts_lyr = L.geoJson(contacts, {onEachFeature: onEachFeature});
+							
+							
+		function	onEachFeature(feature,layer){
+
+			var lg = mapLayerGroups[feature.properties.STATE];
+			console.log(mapLayerGroups);
+			console.log(feature.properties.STATE);
+			console.log("Lg is "+lg);
+
+				if (lg === undefined) {
+				lg = new L.layerGroup();
+				//add layer to map
+				console.log("LG is "+ lg);
+				lg.addTo(map);
+				//store layer
+				console.log("Lg added to map!");
+				mapLayerGroups[feature.properties.STATE] = feature.properties.STATE;
+				}
+				layer.bindPopup("<b>NAME: </b>" + feature.properties.NAME + "<br><b>TITLE: </b>" + feature.properties.TITLE + "<br><b>COMPANY: </b>" + feature.properties.COMPANY + "<br><b>CELL: </b>" + feature.properties.CELL + "<br><b>OFFICE: </b>" + feature.properties.OFFICE + "<br><b>EMAIL: </b>" + feature.properties.EMAIL + "<br><b>WEBSITE: </b><a href="+feature.properties.WEBSITE+">click here</a>");
+				console.log(layer);
+				console.log(lg);
+				lg.addLayer(layer);
+				}
+		
+
+		function showLayer(id) {
+			var lg = mapLayerGroups[id];
+			console.log(mapLayerGroups);
+			console.log("lg is" +lg);
+			map.addLayer(lg);
+		}
+
+		function hideLayer(id) {
+			var lg=mapLayerGroups[id];
+			map.removeLayer(lg);
+
+		}	
+		showLayer("AZ");				/*
+							onEachFeature: function (feature, layer) {
+       		 				layer.bindPopup("<b>NAME: </b>" + feature.properties.NAME + "<br><b>TITLE: </b>" + feature.properties.TITLE + "<br><b>COMPANY: </b>" + feature.properties.COMPANY + "<br><b>CELL: </b>" + feature.properties.CELL + "<br><b>OFFICE: </b>" + feature.properties.OFFICE + "<br><b>EMAIL: </b>" + feature.properties.EMAIL + "<br><b>WEBSITE: </b><a href="+feature.properties.WEBSITE+">click here</a>");
+   			 				}*/
+		//contact_lyr.bindPopup()
+		//Search function
+
+		
+
+		//Attempting Filter Function
+
+		</script>
+		
+	
+</body>
+</html>
